@@ -1,0 +1,31 @@
+[Unit]
+Description=sikw00fsentinel - autonomous SCAN/INSPECT drone state machine -> TAK
+Documentation=https://github.com/snstac
+After=network-online.target
+Wants=network-online.target
+# Owns the SiK radio: mutually exclusive with the standalone scan/eavesdrop paths.
+Conflicts=sikw00fscan.service
+# TAK loss is fatal by design; never throttle/abandon the restart loop.
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/default/sikw00fsentinel
+ExecStart=/opt/sikw00fcot/venv/bin/sikw00fsentinel
+Restart=always
+RestartSec=5
+User=sikw00fcot
+Group=sikw00fcot
+SupplementaryGroups=dialout
+Environment=HOME=/var/lib/sikw00fcot
+WorkingDirectory=/var/lib/sikw00fcot
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/sikw00fcot
+PrivateTmp=true
+DeviceAllow=char-ttyUSB rw
+DevicePolicy=closed
+
+[Install]
+WantedBy=multi-user.target

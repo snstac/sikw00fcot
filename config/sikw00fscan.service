@@ -1,0 +1,34 @@
+[Unit]
+Description=sikw00fscan - continuous SiK promiscuous scan -> TAK detection alerts
+Documentation=https://github.com/snstac
+After=network-online.target
+Wants=network-online.target
+# Mutually exclusive with eavesdrop: both want the SiK radio.
+Conflicts=sikw00f-eavesdrop.service
+# TAK loss is fatal by design; never throttle/abandon the restart loop while
+# TAK is down (0 = no rate limit, keep restarting until it reconnects).
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/default/sikw00fscan
+ExecStart=/opt/sikw00fcot/venv/bin/sikw00fscan
+Restart=always
+RestartSec=5
+User=sikw00fcot
+Group=sikw00fcot
+# Needs the dialout group to open the SiK serial device.
+SupplementaryGroups=dialout
+Environment=HOME=/var/lib/sikw00fcot
+WorkingDirectory=/var/lib/sikw00fcot
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/sikw00fcot
+PrivateTmp=true
+# Allow access to the serial device under ProtectSystem=strict.
+DeviceAllow=char-ttyUSB rw
+DevicePolicy=closed
+
+[Install]
+WantedBy=multi-user.target

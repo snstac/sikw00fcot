@@ -1,0 +1,30 @@
+[Unit]
+Description=sikw00fcot - SiKW00F drone telemetry to TAK (CoT) gateway
+Documentation=https://github.com/snstac
+After=network-online.target
+Wants=network-online.target
+# TAK loss is fatal by design; never throttle/abandon the restart loop while
+# TAK is down (0 = no rate limit, keep restarting until it reconnects).
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+# Reads /etc/default/sikw00fcot for COT_URL, PYTAK_TLS_*, MAV_URL, etc.
+EnvironmentFile=/etc/default/sikw00fcot
+ExecStart=/opt/sikw00fcot/venv/bin/sikw00fcot
+Restart=always
+RestartSec=5
+User=sikw00fcot
+Group=sikw00fcot
+# PyTAK enrollment / cert cache needs a writable HOME (adsbcot lesson).
+Environment=HOME=/var/lib/sikw00fcot
+WorkingDirectory=/var/lib/sikw00fcot
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/sikw00fcot
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

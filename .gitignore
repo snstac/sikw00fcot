@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Packaging artifacts
+*.deb
+*.rpm
+
+# Secrets / local config — never commit enrolled certs or live EnvironmentFiles
+*.pem
+*.key
+/etc/
+sikw00f*sentinel
+!config/*.config.example
+
+# Editor / OS
+.DS_Store
+*.swp

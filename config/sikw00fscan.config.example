@@ -1,0 +1,36 @@
+# sikw00fscan configuration (systemd EnvironmentFile format).
+# Install to /etc/default/sikw00fscan (chmod 600 root:root).
+# Continuously scans (promiscuous mode) and alerts to TAK on detected drone links.
+# NB: OWNS the SiK radio — do NOT run `sikw00f --eavesdrop` at the same time.
+
+# --- TAK destination (same enrolled cert as sikw00fcot) ---
+COT_URL=tls://takserver.snstak.com:8089
+PYTAK_TLS_CLIENT_CERT=/etc/sikw00fcot/sikw00fcot.pem
+PYTAK_TLS_CLIENT_KEY=/etc/sikw00fcot/sikw00fcot-key.pem
+PYTAK_TLS_CLIENT_CAFILE=/etc/sikw00fcot/sikw00fcot-ca.pem
+PYTAK_TLS_DONT_CHECK_HOSTNAME=1
+
+# --- SiK radio ---
+DEVICE=/dev/ttyUSB0
+BAUD=57600
+
+# --- Sensor location (REQUIRED) — detections are placed here with SENSOR_CE radius
+#     since a scan has no drone GPS position. Set to nebra's real location.
+SENSOR_LAT=0.0
+SENSOR_LON=0.0
+SENSOR_CE=1000.0
+
+# --- Alert shaping ---
+COT_TYPE=a-u-A
+COT_STALE=120
+COT_INTERVAL=10
+# Stop refreshing a NetID's alert after this many seconds without a hit (it then
+# stales out of TAK).
+DETECT_TTL=120
+# Require a "NetID: X" line to appear this many times before alerting (filters
+# transient scan-line parse fragments; the real link reports constantly).
+DETECT_MIN_HITS=4
+
+# Extra NetIDs to suppress (comma/space separated). The radio's OWN NetID is
+# always ignored automatically.
+IGNORE_NETIDS=

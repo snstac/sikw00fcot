@@ -1,0 +1,52 @@
+# sikw00fsentinel configuration (systemd EnvironmentFile format).
+# Install to /etc/default/sikw00fsentinel (chmod 600 root:root).
+# Autonomous SCAN -> INSPECT -> SCAN state machine on one SiK radio.
+# OWNS the radio — do NOT run sikw00fscan / sikw00f --eavesdrop at the same time.
+
+# --- TAK destination (enrolled PEM certs) ---
+# tls://...:8089 is the conservative default (stable, no footguns).
+# wss://...:8443/takproto/1 ALSO works with these PEM certs IF:
+#   * you use the direct wss:// URL (NOT a tak:// enroll URL — pytak's enrollment
+#     path reuses a ClientTimeout(total=30) session that kills the ws at ~30s), and
+#   * takproto is installed (else pytak sends raw XML and TAK drops it).
+#   * CAUTION: pytak's wss 403 handler DELETES the PEM cert it used — keep a backup.
+COT_URL=tls://takserver.snstak.com:8089
+#COT_URL=wss://takserver.snstak.com:8443/takproto/1
+PYTAK_TLS_CLIENT_CERT=/etc/sikw00fcot/sikw00fcot.pem
+PYTAK_TLS_CLIENT_KEY=/etc/sikw00fcot/sikw00fcot-key.pem
+PYTAK_TLS_CLIENT_CAFILE=/etc/sikw00fcot/sikw00fcot-ca.pem
+PYTAK_TLS_DONT_CHECK_HOSTNAME=1
+
+# --- SiK radio ---
+DEVICE=/dev/ttyUSB0
+BAUD=57600
+# This sensor radio's own NetID — asserted at boot and restored after each
+# INSPECT, and always excluded from detections. Pick a value your target drones
+# won't use. If unset, the sentinel reads whatever NetID is on the radio (fragile).
+SENSOR_NETID=25
+
+# --- Sensor location (detections/status are placed here) ---
+SENSOR_LAT=37.760033
+SENSOR_LON=-122.497715
+SENSOR_CE=1000.0
+SENSOR_NAME=nebra
+
+# --- SCAN ---
+# "NetID: X" lines required before a detection is confirmed (filters fragments).
+DETECT_MIN_HITS=4
+# NetIDs to never detect (own radio NetID is auto-excluded).
+IGNORE_NETIDS=
+
+# --- INSPECT ---
+# Seconds with NO decoded MAVLink before reverting INSPECT -> SCAN.
+INSPECT_TIMEOUT=30
+# After a failed inspect, don't re-inspect that NetID for this long (anti-thrash).
+INSPECT_COOLDOWN=30
+
+# --- CoT shaping ---
+COT_TYPE=a-u-A-M-H-Q
+COT_STALE=120
+COT_INTERVAL=5
+# Status/mode marker (a-f-G-E-S = friendly ground sensor).
+STATUS_COT_TYPE=a-f-G-E-S
+STATUS_INTERVAL=30

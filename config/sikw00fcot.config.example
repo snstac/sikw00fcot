@@ -1,0 +1,23 @@
+# sikw00fcot configuration (systemd EnvironmentFile format).
+# Install to /etc/default/sikw00fcot  (chmod 600 root:root).
+
+# --- TAK destination (reuse the snstac cert pattern, like aiscot/adsbcot) ---
+COT_URL=tls://takserver.snstak.com:8089
+PYTAK_TLS_CLIENT_CERT=/etc/sikw00fcot/sikw00fcot.pem
+PYTAK_TLS_CLIENT_KEY=/etc/sikw00fcot/sikw00fcot-key.pem
+PYTAK_TLS_CLIENT_CAFILE=/etc/sikw00fcot/sikw00fcot-ca.pem
+# Server cert CN != hostname; keep CA verification ON, skip hostname check.
+PYTAK_TLS_DONT_CHECK_HOSTNAME=1
+
+# --- MAVLink source (SiKW00F UDP fan-out) ---
+MAV_URL=udpin:127.0.0.1:14550
+
+# --- CoT shaping ---
+# a-u-A-M-H-Q = air / unknown affiliation / multirotor UAS. Change to
+# a-h-A-M-F-Q (hostile) or a-f-... (friendly) per your ROE.
+COT_TYPE=a-u-A-M-H-Q
+COT_STALE=120
+COT_INTERVAL=2.0
+# Optional: NetID of the tracked SiK link, used in the CoT UID/callsign.
+#SIK_NETID=
+#COT_CALLSIGN=
